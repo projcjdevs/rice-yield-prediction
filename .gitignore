@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.Python
+build/
+dist/
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+
+# Raw data — large or re-fetchable from source APIs; keep a README explaining how to regenerate it
+data/raw/*
+!data/raw/README.md
+
+# Uncomment below only if a serialized model exceeds GitHub's recommended file size (~50MB)
+# models/*.joblib
