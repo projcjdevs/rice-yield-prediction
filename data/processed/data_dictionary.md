@@ -8,7 +8,8 @@ This file documents the final merged dataset in [merged_rice_yield_dataset.csv](
 |---|---|---|---|---|
 | season_period | categorical | normalized season labels | `2021_Semester_2`, `2022_Semester_1` | merge key |
 | ecosystem | categorical | normalized yield + area source labels | `Irrigated`, `Non-irrigated` | normalized casing |
-| island_group | categorical | climate province mapping | `Luzon`, `Visayas`, `Mindanao` | used instead of raw province in the final model |
+| province | categorical | yield and harvested-area source | province names | retained for auditability and leave-one-province-out grouping; exclude from model features |
+| island_group | categorical | climate province mapping | `Luzon`, `Visayas`, `Mindanao` | geographic model feature |
 | yield_mt_ha | float | yield source | metric tons per hectare | target variable; zero missing values |
 | area_harvested_ha | float | harvested-area source | hectares | season-specific provincial area |
 | n_application_rate | float | fertilizer by-element source | kg/ha | nitrogen |
@@ -30,7 +31,7 @@ This file documents the final merged dataset in [merged_rice_yield_dataset.csv](
 ## Assumptions and handling notes
 
 - The fertilizer by-element values are treated as kg/ha, even though the raw file label says "in kg". This follows the project agronomic assumption and the final model input design.
-- The final model uses island_group rather than raw province because one-hot province encoding breaks leave-one-province-out validation.
+- The model uses `island_group` as its geographic feature; `province` remains available for auditability and leave-one-province-out grouping, not feature encoding.
 - Source-coverage gaps were not filled; they were left out by the merge. Basilan is the clearest example of a legitimate data gap in the fertilizer tables.
 - In-source missing values were set to 0 when the missing value meant “no usage recorded,” rather than dropping rows outright.
 - soil_ph is intentionally disclosed as a synthetic modeled feature anchored roughly between 5.0 and 6.5 and slightly less acidic in irrigated ecosystems.

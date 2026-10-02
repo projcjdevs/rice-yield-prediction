@@ -1,0 +1,252 @@
+{
+  "row_count": 287,
+  "column_count": 21,
+  "dropped_rows_by_source": {
+    "yield_without_area_match": 4,
+    "incomplete_element_records": 0,
+    "incomplete_grade_records": 0,
+    "required_nulls_after_merge": 0
+  },
+  "yield_area_coverage": [
+    {
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Irrigated",
+      "yield_source_rows": 79,
+      "area_matches": 78,
+      "yield_rows_without_area": 1
+    },
+    {
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Non-irrigated",
+      "yield_source_rows": 78,
+      "area_matches": 77,
+      "yield_rows_without_area": 1
+    },
+    {
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Irrigated",
+      "yield_source_rows": 78,
+      "area_matches": 77,
+      "yield_rows_without_area": 1
+    },
+    {
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Non-irrigated",
+      "yield_source_rows": 65,
+      "area_matches": 64,
+      "yield_rows_without_area": 1
+    }
+  ],
+  "yield_without_area_keys": [
+    {
+      "province": "Maguindanao",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Irrigated"
+    },
+    {
+      "province": "Maguindanao",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Non-irrigated"
+    },
+    {
+      "province": "Maguindanao",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Irrigated"
+    },
+    {
+      "province": "Maguindanao",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Non-irrigated"
+    }
+  ],
+  "join_stage_counts": [
+    {
+      "stage": "yield+area",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Irrigated",
+      "rows": 78
+    },
+    {
+      "stage": "yield+area",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Non-irrigated",
+      "rows": 77
+    },
+    {
+      "stage": "yield+area",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Irrigated",
+      "rows": 77
+    },
+    {
+      "stage": "yield+area",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Non-irrigated",
+      "rows": 64
+    },
+    {
+      "stage": "+elements",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Irrigated",
+      "rows": 76
+    },
+    {
+      "stage": "+elements",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Non-irrigated",
+      "rows": 73
+    },
+    {
+      "stage": "+elements",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Irrigated",
+      "rows": 76
+    },
+    {
+      "stage": "+elements",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Non-irrigated",
+      "rows": 62
+    },
+    {
+      "stage": "+grades",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Irrigated",
+      "rows": 76
+    },
+    {
+      "stage": "+grades",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Non-irrigated",
+      "rows": 73
+    },
+    {
+      "stage": "+grades",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Irrigated",
+      "rows": 76
+    },
+    {
+      "stage": "+grades",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Non-irrigated",
+      "rows": 62
+    },
+    {
+      "stage": "+climate",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Irrigated",
+      "rows": 76
+    },
+    {
+      "stage": "+climate",
+      "season_period": "2021_Semester_2",
+      "ecosystem": "Non-irrigated",
+      "rows": 73
+    },
+    {
+      "stage": "+climate",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Irrigated",
+      "rows": 76
+    },
+    {
+      "stage": "+climate",
+      "season_period": "2022_Semester_1",
+      "ecosystem": "Non-irrigated",
+      "rows": 62
+    }
+  ],
+  "element_null_records": [],
+  "grade_null_records": [],
+  "province_aliases_applied_to_climate": {
+    "cotabato": "North Cotabato",
+    "samar": "Western Samar",
+    "surigao del norte": "Surigao del Norte",
+    "surigao del sur": "Surigao del Sur"
+  },
+  "province_reconciliation": {
+    "source_counts": {
+      "yield": 81,
+      "area": 80,
+      "fertilizer_elements": 77,
+      "fertilizer_grades": 77,
+      "climate": 82
+    },
+    "dropped_provinces": [
+      {
+        "province": "Basilan",
+        "absent_from": "fertilizer_elements, fertilizer_grades",
+        "reason": "absent from: fertilizer_elements, fertilizer_grades"
+      },
+      {
+        "province": "Batanes",
+        "absent_from": "fertilizer_elements, fertilizer_grades",
+        "reason": "absent from: fertilizer_elements, fertilizer_grades"
+      },
+      {
+        "province": "Maguindanao",
+        "absent_from": "area, climate",
+        "reason": "absent from: area, climate"
+      },
+      {
+        "province": "Maguindanao del Norte",
+        "absent_from": "yield, area, fertilizer_elements, fertilizer_grades",
+        "reason": "absent from: yield, area, fertilizer_elements, fertilizer_grades"
+      },
+      {
+        "province": "Maguindanao del Sur",
+        "absent_from": "yield, area, fertilizer_elements, fertilizer_grades",
+        "reason": "absent from: yield, area, fertilizer_elements, fertilizer_grades"
+      },
+      {
+        "province": "Sulu",
+        "absent_from": "fertilizer_elements, fertilizer_grades",
+        "reason": "absent from: fertilizer_elements, fertilizer_grades"
+      },
+      {
+        "province": "Tawi-Tawi",
+        "absent_from": "fertilizer_elements, fertilizer_grades",
+        "reason": "absent from: fertilizer_elements, fertilizer_grades"
+      }
+    ]
+  },
+  "dropped_provinces": [
+    {
+      "province": "Basilan",
+      "absent_from": "fertilizer_elements, fertilizer_grades",
+      "reason": "absent from: fertilizer_elements, fertilizer_grades"
+    },
+    {
+      "province": "Batanes",
+      "absent_from": "fertilizer_elements, fertilizer_grades",
+      "reason": "absent from: fertilizer_elements, fertilizer_grades"
+    },
+    {
+      "province": "Maguindanao",
+      "absent_from": "area, climate",
+      "reason": "absent from: area, climate"
+    },
+    {
+      "province": "Maguindanao del Norte",
+      "absent_from": "yield, area, fertilizer_elements, fertilizer_grades",
+      "reason": "absent from: yield, area, fertilizer_elements, fertilizer_grades"
+    },
+    {
+      "province": "Maguindanao del Sur",
+      "absent_from": "yield, area, fertilizer_elements, fertilizer_grades",
+      "reason": "absent from: yield, area, fertilizer_elements, fertilizer_grades"
+    },
+    {
+      "province": "Sulu",
+      "absent_from": "fertilizer_elements, fertilizer_grades",
+      "reason": "absent from: fertilizer_elements, fertilizer_grades"
+    },
+    {
+      "province": "Tawi-Tawi",
+      "absent_from": "fertilizer_elements, fertilizer_grades",
+      "reason": "absent from: fertilizer_elements, fertilizer_grades"
+    }
+  ],
+  "null_policy": "A present fertilizer record with a missing element rate or incomplete named grade rank is excluded, not filled with zero. A grade absent from the reported top-five list is encoded as zero, meaning unlisted rather than confirmed zero use. A province absent from a source is not imputed."
+}
