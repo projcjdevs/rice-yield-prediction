@@ -8,6 +8,7 @@ from src.data.merge import build_merged_dataset
 EXPECTED_COLUMNS = [
     'season_period',
     'ecosystem',
+    'province',
     'island_group',
     'yield_mt_ha',
     'area_harvested_ha',
@@ -40,4 +41,6 @@ def test_contract_1_dataset_is_complete_and_valid():
     assert len(df) == 287
     assert df['yield_mt_ha'].notna().all()
     assert df['soil_ph'].between(5.0, 6.5).all()
+    assert df['province'].notna().all()
+    assert df.groupby(['province', 'ecosystem'])['soil_ph'].nunique().eq(1).all()
     assert df['island_group'].isin(['Luzon', 'Visayas', 'Mindanao']).all()
