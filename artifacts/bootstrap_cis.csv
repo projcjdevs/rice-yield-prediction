@@ -1,0 +1,6 @@
+Setting,RMSE,CI_2.5%,CI_97.5%
+Ridge + Copula 3x,0.6844,0.6231,0.7377
+Ridge + Mixup 3x,0.6669,0.6079,0.7184
+Ridge + None 1x,0.6749,0.615,0.728
+RF + Copula 3x,0.7023,0.6349,0.7606
+RF + Mixup 3x,0.6838,0.6188,0.7437

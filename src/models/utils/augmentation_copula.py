@@ -5,7 +5,8 @@ import pandas as pd
 
 
 def _build_synthesizer(df):
-    """Version-tolerant construction: sdv changed its metadata API in 1.x."""
+    """Version-tolerant construction: sdv changed its metadata API in 1.x.
+    Note: sdv calls the Gaussian marginal 'norm' (maps to GaussianUnivariate)."""
     from sdv.single_table import GaussianCopulaSynthesizer
 
     try:
@@ -22,12 +23,11 @@ def _build_synthesizer(df):
 
     num_cols = [c for c in df.columns if df[c].dtype.kind == "f"]
     try:
-        return GaussianCopulaSynthesizer(metadata, default_distribution="gaussian")
+        return GaussianCopulaSynthesizer(metadata, default_distribution="norm")
     except TypeError:
         return GaussianCopulaSynthesizer(
-            metadata, numerical_distributions={c: "gaussian" for c in num_cols}
+            metadata, numerical_distributions={c: "norm" for c in num_cols}
         )
-
 
 def copula_augment(df_fold, multiplier, random_state=None, synth_weight=0.5):
     """Return (synthetic_raw_df, synthetic_weights) for a raw fold dataframe
