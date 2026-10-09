@@ -1,0 +1,17 @@
+[
+  "num_std__n_application_rate",
+  "num_std__p_application_rate",
+  "num_std__k_application_rate",
+  "num_std__total_fertilizer_kg_ha",
+  "num_std__fertilizer_diversification_index",
+  "num_std__rainfall_mm",
+  "num_std__solar_radiation_mj_m2",
+  "num_std__soil_ph",
+  "num_std__temp_mean_c",
+  "num_std__temp_range_c",
+  "num_log__area_harvested_ha",
+  "cat__season_period_2022_Semester_1",
+  "cat__ecosystem_Non-irrigated",
+  "cat__island_group_Mindanao",
+  "cat__island_group_Visayas"
+]
