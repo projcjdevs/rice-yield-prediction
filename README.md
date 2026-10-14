@@ -1,103 +1,46 @@
-# Rice Yield Prediction — Intro to ML Final Project
+# Predicting Provincial Rice Yield in the Philippines
 
-Supervised regression project predicting province-level Philippine rice (palay) yield from combined fertilizer input, climate conditions, and soil pH. Built by a 3-person team, each owning one stage of the pipeline.
+COM241 Introduction to Machine Learning. Charles John R. Cabatian, Nico Andrew O. Gallardo, Renz Jerik C. Viloria. Instructor: Dr. Armida P. Salazar.
 
-Full context (problem statement, architecture, data sources, canonical schema, model roster, roadmap, and pipeline contracts) lives in **`docs/`** — read those before touching code. `docs/04_unified_llm_prompt.md` is the block each member pastes into their own LLM session so all three stay aligned.
+Regression of province-level average rice yield (MT/ha) on fertilizer, climate and a simulated soil pH. 287 rows (province x season x ecosystem), 76 provinces, 2021 Semester 2 and 2022 Semester 1.
 
----
+## Results (see the paper for details)
 
-## Repository Structure
+| Evaluation | RMSE | MAE | R2 |
+|---|---|---|---|
+| Validation, leave-one-province-out, 60 provinces (Ridge + 3x mixup) | 0.667 | 0.541 | 0.387 |
+| Sealed test, 16 provinces, evaluated once | 0.702 | 0.475 | 0.282 |
 
-```
-rice-yield-prediction/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── .github/
-│   └── PULL_REQUEST_TEMPLATE.md
-├── docs/
-│   ├── 01_project_overview_and_architecture.md
-│   ├── 02_roadmap_and_contracts.md
-│   ├── 03_task_delegation.md
-│   └── 04_unified_llm_prompt.md
-├── data/
-│   ├── raw/                  # gitignored — raw pulls from each source (Member 1)
-│   │   └── README.md
-│   └── processed/            # Contract 1 deliverable (Member 1 → Member 2)
-│       ├── README.md
-│       ├── data_dictionary.md
-│       └── merged_rice_yield_dataset.csv   (generated, not yet in repo)
-├── notebooks/
-│   ├── 01_data_acquisition_and_eda.ipynb        (Member 1)
-│   ├── 02_feature_engineering_and_modeling.ipynb (Member 2)
-│   └── 03_evaluation_and_deployment.ipynb        (Member 3)
-├── src/
-│   ├── data/
-│   │   ├── acquire.py        # pulls PalayStat / Ricelytics / NASA POWER / SoilGrids
-│   │   └── merge.py          # merges into the canonical schema
-│   ├── features/
-│   │   └── build_features.py # feature engineering + preprocessing pipeline
-│   └── models/
-│       ├── train.py          # trains all 4 models (baseline + 3 required)
-│       └── evaluate.py       # metrics + one-time test-set confirmation
-├── models/                   # Contract 2 deliverable (Member 2 → Member 3)
-│   └── README.md
-├── reports/
-│   ├── README.md
-│   ├── figures/
-│   ├── eda_findings.md               (Member 1, generated)
-│   ├── model_metrics.csv             (Member 2, generated)
-│   └── final_model_justification.md  (Member 3, generated)
-├── app/
-│   └── app.py                # Streamlit deployment (Member 3)
-└── tests/
-    └── README.md
-```
+Post hoc baselines (added after the test evaluation; they did not influence model selection):
 
-Files marked "(generated)" don't exist yet in this skeleton — they're produced as each member completes their stage and are committed once ready, per the contracts in `docs/02_roadmap_and_contracts.md`.
+| Predictor | Validation RMSE | Test RMSE |
+|---|---|---|
+| Overall mean | 0.859 | 0.845 |
+| Mean per ecosystem | 0.725 | 0.722 |
+| Mean per season x ecosystem x island group | 0.704 | 0.619 |
+| Selected model | 0.667 | 0.702 |
 
----
+The selected model and the 12-cell lookup are not statistically distinguishable (province-level paired bootstrap, all intervals include zero). Most predictable variation comes from irrigation status and island group. Soil pH is simulated and mostly encodes ecosystem. See `src/diagnostics/extra_checks.py`.
 
-## Setup
+## Reproduce
 
 ```bash
-git clone <your-repo-url>
-cd rice-yield-prediction
-
-python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
-
 pip install -r requirements.txt
-```
-
-## Running things
-
-**Notebooks** (open in order, one per pipeline stage):
-```bash
-jupyter notebook notebooks/
-```
-
-**The deployed app** (once Member 2's model artifacts exist in `models/`):
-```bash
+# run notebooks 01 to 06 in order, or:
+python src/diagnostics/extra_checks.py --out artifacts/extra_checks_results.json
 streamlit run app/app.py
 ```
 
----
+## Layout
 
-## Git Workflow
+- `data/processed/merged_rice_yield_dataset.csv`: the modeling dataset and `data_dictionary.md`
+- `notebooks/01_eda.ipynb` to `06_evaluate.ipynb`: EDA, split, preprocessing, augmentation, training, evaluation
+- `artifacts/`: metrics, out-of-fold and test predictions, split definition, bootstrap intervals
+- `models/`: saved Ridge model and preprocessing pipeline used by the app
+- `app/app.py`: Streamlit app (local)
+- `src/`: shared code, `src/diagnostics/`: post hoc checks
+- `docs/`: planning documents and EDA figures
 
-- **Branch per member/stage**, not per tiny change: `member1/data-eda`, `member2/feature-modeling`, `member3/eval-deploy`. Cut smaller feature branches off these if useful.
-- **Never commit directly to `main`.** Open a PR (template auto-fills a contract checklist) and have at least one other member glance at it before merging — cheap insurance against silently breaking another member's contract.
-- **If a PR changes a contract's shape** (renames a column, changes a filename, changes what a stage outputs), update `docs/02_roadmap_and_contracts.md` and `docs/04_unified_llm_prompt.md` in the *same* PR — don't let the docs drift from what the code actually does.
-- **Keep `data/raw/` out of Git** (already handled by `.gitignore`) — it's either large or trivially re-fetchable from the source APIs/portals; only the cleaned `data/processed/` output is committed.
-- **Commit messages:** short, imperative, and scoped — e.g. `feat(data): merge PalayStat and NASA POWER on province+year`, not `updates`.
+## Known limitations
 
-## Team
-
-| Member | Pipeline Stage | Contract Owned |
-|---|---|---|
-| Member 1 | Data Acquisition, Merging & EDA | Contract 1 |
-| Member 2 | Feature Engineering & Model Training | Contract 2 |
-| Member 3 | Evaluation, Selection & Deployment | Contract 3 |
-
-See `docs/03_task_delegation.md` for the full task breakdown per member.
+Soil pH is simulated, not measured. Fertilizer values are assumed to be kg/ha. Only two seasons (also two years). Hyperparameters were not tuned. Area harvested is known only after harvest. See the paper, Section IV.
