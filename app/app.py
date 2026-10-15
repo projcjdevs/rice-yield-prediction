@@ -24,7 +24,60 @@ ROOT = Path(__file__).resolve().parents[1]
 PREPROCESSING_PATH = ROOT / "models/preprocessing_pipeline.joblib"
 MODEL_PATH = ROOT / "models/model_ridge.joblib"
 
-# 3. Sidebar: Usage Guide & Context
+# 3. Pre-defined Test Cases
+TEST_CASES = {
+    "🌱 1. Baseline (Happy Path)": {
+        "season_period": "2021_Semester_2", "ecosystem": "Irrigated", "island_group": "Luzon",
+        "area_harvested_ha": 5000.0, "soil_ph": 5.8, "rainfall_mm": 1500.0, "solar_radiation_mj_m2": 17.5,
+        "temp_max_c": 30.0, "temp_min_c": 23.0,
+        "n_rate": 75.0, "p_rate": 15.0, "k_rate": 15.0,
+        "grade_urea": 80.0, "grade_complete": 70.0, "grade_ammophos": 15.0, "grade_ammosul": 10.0, "grade_mop": 5.0,
+        "description": "Standard irrigated farm in Luzon. Expected: ~4.1 t/ha, normal derived inputs."
+    },
+    "⚠️ 2. Invalid Temp (Auto-Correct)": {
+        "season_period": "2021_Semester_2", "ecosystem": "Irrigated", "island_group": "Luzon",
+        "area_harvested_ha": 5000.0, "soil_ph": 5.8, "rainfall_mm": 1500.0, "solar_radiation_mj_m2": 17.5,
+        "temp_max_c": 20.0, "temp_min_c": 25.0, # Intentionally swapped
+        "n_rate": 75.0, "p_rate": 15.0, "k_rate": 15.0,
+        "grade_urea": 80.0, "grade_complete": 70.0, "grade_ammophos": 15.0, "grade_ammosul": 10.0, "grade_mop": 5.0,
+        "description": "Min temp > Max temp. Expected: App warns and auto-swaps values to prevent pipeline crash."
+    },
+    "📉 3. Zero Fertilizer": {
+        "season_period": "2021_Semester_2", "ecosystem": "Irrigated", "island_group": "Luzon",
+        "area_harvested_ha": 5000.0, "soil_ph": 5.8, "rainfall_mm": 1500.0, "solar_radiation_mj_m2": 17.5,
+        "temp_max_c": 30.0, "temp_min_c": 23.0,
+        "n_rate": 0.0, "p_rate": 0.0, "k_rate": 0.0,
+        "grade_urea": 0.0, "grade_complete": 0.0, "grade_ammophos": 0.0, "grade_ammosul": 0.0, "grade_mop": 0.0,
+        "description": "No fertilizer applied. Expected: Yield drops (~3.6 t/ha), Div Index = 0.0, no division-by-zero crash."
+    },
+    "🚜 4. Extreme Area (Log1p Stress)": {
+        "season_period": "2021_Semester_2", "ecosystem": "Irrigated", "island_group": "Luzon",
+        "area_harvested_ha": 150000.0, "soil_ph": 5.8, "rainfall_mm": 1500.0, "solar_radiation_mj_m2": 17.5,
+        "temp_max_c": 30.0, "temp_min_c": 23.0,
+        "n_rate": 75.0, "p_rate": 15.0, "k_rate": 15.0,
+        "grade_urea": 80.0, "grade_complete": 70.0, "grade_ammophos": 15.0, "grade_ammosul": 10.0, "grade_mop": 5.0,
+        "description": "Maximum observed area (150k ha). Expected: log1p squashes tail, yield ~4.9 t/ha without overflow."
+    },
+    "🚨 5. High Fertilizer Alert": {
+        "season_period": "2021_Semester_2", "ecosystem": "Irrigated", "island_group": "Luzon",
+        "area_harvested_ha": 5000.0, "soil_ph": 5.8, "rainfall_mm": 1500.0, "solar_radiation_mj_m2": 17.5,
+        "temp_max_c": 30.0, "temp_min_c": 23.0,
+        "n_rate": 200.0, "p_rate": 100.0, "k_rate": 100.0,
+        "grade_urea": 200.0, "grade_complete": 100.0, "grade_ammophos": 50.0, "grade_ammosul": 50.0, "grade_mop": 50.0,
+        "description": "Total fertilizer > 400 kg/ha. Expected: Warning about diminishing returns/environmental runoff."
+    }
+}
+
+def load_test_case(case_name):
+    """Loads a test case into Streamlit's session state to auto-fill the form."""
+    case = TEST_CASES[case_name]
+    for k, v in case.items():
+        if k != "description":
+            st.session_state[k] = v
+    st.session_state.test_description = case["description"]
+    st.rerun()
+
+# 4. Sidebar: Usage Guide & Context
 with st.sidebar:
     st.header("🌾 How to Use This Tool")
     st.markdown("""
@@ -46,7 +99,7 @@ with st.sidebar:
     - **Scope**: This model is trained on 2021-2022 data across 76 Philippine provinces. Predictions are estimates, not guarantees.
     """)
 
-# 4. Load Artifacts
+# 5. Load Artifacts
 st.title("🌾 Philippine Rice Yield Estimator")
 st.caption("Predicting provincial palay yield (t/ha) from agronomic, climate, and soil inputs. Survey-constrained demo (2021-2022 data window).")
 
@@ -64,7 +117,25 @@ except FileNotFoundError:
     3. Or run notebooks `01_eda.ipynb` through `06_evaluate.ipynb`.
     """)
 
-# 5. Form Inputs
+# 6. Test Cases Section
+st.subheader("🧪 Try a Pre-defined Test Case")
+st.markdown("Click a button below to auto-fill the form with a specific scenario to see how the model and UI handle it.")
+
+cols = st.columns(5)
+for i, (name, case) in enumerate(TEST_CASES.items()):
+    with cols[i % 5]:
+        if st.button(name, use_container_width=True):
+            load_test_case(name)
+
+if "test_description" in st.session_state:
+    st.info(f"**Scenario:** {st.session_state.test_description}")
+    if st.button("Clear Test Scenario"):
+        del st.session_state.test_description
+        st.rerun()
+
+st.divider()
+
+# 7. Form Inputs
 with st.form("prediction_form"):
     st.subheader("1. Location & Season")
     col1, col2, col3 = st.columns(3)
@@ -72,18 +143,21 @@ with st.form("prediction_form"):
         season_period = st.selectbox(
             "Season Period", 
             ["2021_Semester_2", "2022_Semester_1"],
+            key="season_period",
             help="The cropping season for your prediction."
         )
     with col2:
         ecosystem = st.selectbox(
             "Ecosystem", 
             ["Irrigated", "Non-irrigated"],
+            key="ecosystem",
             help="Irrigated fields typically have more stable, higher yields."
         )
     with col3:
         island_group = st.selectbox(
             "Island Group", 
             ["Luzon", "Visayas", "Mindanao"],
+            key="island_group",
             help="Broad geographic region, which influences baseline climate and soil patterns."
         )
 
@@ -95,6 +169,7 @@ with st.form("prediction_form"):
             min_value=1.0, 
             value=5000.0, 
             step=100.0,
+            key="area_harvested_ha",
             help="Total area of the farm harvested in hectares."
         )
     with col2:
@@ -104,6 +179,7 @@ with st.form("prediction_form"):
             max_value=8.5, 
             value=5.8, 
             step=0.1,
+            key="soil_ph",
             help="Soil acidity/alkalinity. Values between 5.5 and 6.5 are generally optimal for rice."
         )
 
@@ -116,6 +192,7 @@ with st.form("prediction_form"):
             min_value=0.0, 
             value=1500.0, 
             step=50.0,
+            key="rainfall_mm",
             help="Total precipitation during the semester."
         )
         temp_max_c = st.number_input(
@@ -124,6 +201,7 @@ with st.form("prediction_form"):
             max_value=45.0,
             value=30.0, 
             step=0.5,
+            key="temp_max_c",
             help="Average of the daily maximum temperatures."
         )
     with col2:
@@ -132,6 +210,7 @@ with st.form("prediction_form"):
             min_value=0.0, 
             value=17.5, 
             step=0.5,
+            key="solar_radiation_mj_m2",
             help="Average daily shortwave radiation."
         )
         temp_min_c = st.number_input(
@@ -140,15 +219,13 @@ with st.form("prediction_form"):
             max_value=35.0,
             value=23.0, 
             step=0.5,
+            key="temp_min_c",
             help="Average of the daily minimum temperatures."
         )
 
     # Input Validation for Temperature
-    temp_warning = ""
     if temp_min_c > temp_max_c:
-        temp_warning = "⚠️ **Warning:** Minimum temperature is higher than maximum temperature. The model will automatically swap these values for calculation."
-        st.warning(temp_warning)
-        # Swap for calculation to prevent pipeline errors
+        st.warning("⚠️ **Warning:** Minimum temperature is higher than maximum temperature. The model will automatically swap these values for calculation to prevent pipeline errors.")
         actual_temp_max = temp_min_c
         actual_temp_min = temp_max_c
     else:
@@ -160,26 +237,26 @@ with st.form("prediction_form"):
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        n_rate = st.number_input("Nitrogen (N) Rate", min_value=0.0, value=75.0, step=1.0, help="kg/ha of pure Nitrogen")
+        n_rate = st.number_input("Nitrogen (N) Rate", min_value=0.0, value=75.0, step=1.0, key="n_rate", help="kg/ha of pure Nitrogen")
     with col2:
-        p_rate = st.number_input("Phosphorus (P) Rate", min_value=0.0, value=15.0, step=1.0, help="kg/ha of pure Phosphorus")
+        p_rate = st.number_input("Phosphorus (P) Rate", min_value=0.0, value=15.0, step=1.0, key="p_rate", help="kg/ha of pure Phosphorus")
     with col3:
-        k_rate = st.number_input("Potassium (K) Rate", min_value=0.0, value=15.0, step=1.0, help="kg/ha of pure Potassium")
+        k_rate = st.number_input("Potassium (K) Rate", min_value=0.0, value=15.0, step=1.0, key="k_rate", help="kg/ha of pure Potassium")
 
     st.markdown("**Top 5 Fertilizer Grades Applied (kg/ha):**")
     col1, col2, col3 = st.columns(3)
     with col1:
-        grade_urea = st.number_input("Urea (46-0-0)", min_value=0.0, value=80.0, step=1.0)
-        grade_ammophos = st.number_input("Ammophos (16-20-0)", min_value=0.0, value=15.0, step=1.0)
+        grade_urea = st.number_input("Urea (46-0-0)", min_value=0.0, value=80.0, step=1.0, key="grade_urea")
+        grade_ammophos = st.number_input("Ammophos (16-20-0)", min_value=0.0, value=15.0, step=1.0, key="grade_ammophos")
     with col2:
-        grade_complete = st.number_input("Complete (14-14-14)", min_value=0.0, value=70.0, step=1.0)
-        grade_ammosul = st.number_input("Ammosul (21-0-0)", min_value=0.0, value=10.0, step=1.0)
+        grade_complete = st.number_input("Complete (14-14-14)", min_value=0.0, value=70.0, step=1.0, key="grade_complete")
+        grade_ammosul = st.number_input("Ammosul (21-0-0)", min_value=0.0, value=10.0, step=1.0, key="grade_ammosul")
     with col3:
-        grade_mop = st.number_input("MOP (0-0-60)", min_value=0.0, value=5.0, step=1.0)
+        grade_mop = st.number_input("MOP (0-0-60)", min_value=0.0, value=5.0, step=1.0, key="grade_mop")
 
     submitted = st.form_submit_button("🌾 Predict Yield", type="primary", use_container_width=True)
 
-# 6. Prediction Logic
+# 8. Prediction Logic
 if submitted:
     if not artifacts_loaded:
         st.error("Cannot predict. Model artifacts are missing. Please check the setup instructions in the sidebar.")
@@ -281,5 +358,7 @@ if submitted:
                 st.write(f"- **Diversification Index (Shannon Entropy)**: {div_index:.3f}")
                 st.caption("Note: The model uses a pre-fitted preprocessing pipeline to scale and encode these values before prediction.")
 
+        except ValueError as ve:
+            st.error(f"❌ **Input Validation Error:**\n\n`{str(ve)}`\n\nPlease check your inputs. Ensure all values are within realistic ranges (e.g., Area > 0, pH between 4.0-8.5) and that no required fields are missing or malformed.")
         except Exception as e:
-            st.error(f"❌ **Prediction failed due to an unexpected error:**\n\n`{str(e)}`\n\nPlease check your inputs and ensure they are within realistic ranges. If the problem persists, contact the development team.")
+            st.error(f"❌ **Unexpected Prediction Error:**\n\n`{str(e)}`\n\nIf this persists, the model artifacts may be corrupted or mismatched with the input schema. Please contact the development team or re-run the training notebooks.")
