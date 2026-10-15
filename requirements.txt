@@ -11,3 +11,4 @@ pytest>=8.0
 lightgbm>=4.0       
 sdv>=1.0             
 openpyxl>=3.1       
+pytest 
